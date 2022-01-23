@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Image Viewer Service
+  description: HTTP service for viewing image files hosted on S3
+  version: "1.0"
+servers:
+- url: http://localhost:8088
+paths:
+  /folders:
+    get:
+      tags:
+      - image-viewer
+      summary: folders image-viewer
+      operationId: image-viewer#folders
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: Dolorum alias distinctio mollitia.
+                example:
+                - Asperiores corporis quam optio quia.
+                - Hic nulla sed velit.
+                - Est quo.
+              example:
+              - Esse ut.
+              - Voluptatem earum molestiae consequatur voluptatem rem.
+  /images:
+    get:
+      tags:
+      - image-viewer
+      summary: images image-viewer
+      operationId: image-viewer#images
+      parameters:
+      - name: folder
+        in: query
+        allowEmptyValue: true
+        schema:
+          type: string
+          example: Qui ut ipsa vero in ab.
+        example: Deleniti id vero laboriosam culpa.
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Image'
+                example:
+                - name: Necessitatibus consequatur dolorem saepe.
+                  original_url: Quia provident praesentium.
+                  thumbnail_url: Consectetur officia.
+                - name: Necessitatibus consequatur dolorem saepe.
+                  original_url: Quia provident praesentium.
+                  thumbnail_url: Consectetur officia.
+              example:
+              - name: Necessitatibus consequatur dolorem saepe.
+                original_url: Quia provident praesentium.
+                thumbnail_url: Consectetur officia.
+              - name: Necessitatibus consequatur dolorem saepe.
+                original_url: Quia provident praesentium.
+                thumbnail_url: Consectetur officia.
+              - name: Necessitatibus consequatur dolorem saepe.
+                original_url: Quia provident praesentium.
+                thumbnail_url: Consectetur officia.
+              - name: Necessitatibus consequatur dolorem saepe.
+                original_url: Quia provident praesentium.
+                thumbnail_url: Consectetur officia.
+components:
+  schemas:
+    Image:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name
+          example: Non possimus.
+        original_url:
+          type: string
+          description: signed original image url
+          example: Voluptate exercitationem perferendis quia officia ut.
+        thumbnail_url:
+          type: string
+          description: signed thumbnail image url
+          example: Quo laboriosam non.
+      example:
+        name: Laborum enim maiores est similique sit.
+        original_url: Asperiores nesciunt unde similique enim distinctio magnam.
+        thumbnail_url: Sequi ex quidem reiciendis.
+tags:
+- name: image-viewer
+  description: The image-viewer service

@@ -20,12 +20,12 @@ var _ = Service("image-viewer", func() {
 	Description("The image-viewer service")
 	// Method describes a service method (endpoint)
 	Method("folders", func() {
-		Payload(func() {
-		})
 		Result(ArrayOf(String))
 		HTTP(func() {
 			GET("/folders")
-			Response(StatusOK)
+			Response(StatusOK, func() {
+				ContentType("application/json")
+			})
 		})
 	})
 
@@ -37,7 +37,9 @@ var _ = Service("image-viewer", func() {
 		HTTP(func() {
 			GET("/images")
 			Param("folder")
-			Response(StatusOK)
+			Response(StatusOK, func() {
+				ContentType("application/json")
+			})
 		})
 	})
 })

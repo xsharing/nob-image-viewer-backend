@@ -19,6 +19,8 @@ paths:
       - image-viewer
       summary: folders image-viewer
       operationId: image-viewer#folders
+      produces:
+      - application/json
       responses:
         "200":
           description: OK response.
@@ -35,6 +37,8 @@ paths:
       - image-viewer
       summary: images image-viewer
       operationId: image-viewer#images
+      produces:
+      - application/json
       parameters:
       - name: folder
         in: query

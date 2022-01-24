@@ -2,3 +2,5 @@ node_modules
 bin
 .serverless
 .dccache
+cmd/image_viewer/image_viewer
+gen/http/openapi.json

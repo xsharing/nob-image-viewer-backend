@@ -20,6 +20,7 @@ import (
 func EncodeFoldersResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.([]string)
+		ctx = context.WithValue(ctx, goahttp.ContentTypeKey, "application/json")
 		enc := encoder(ctx, w)
 		body := res
 		w.WriteHeader(http.StatusOK)
@@ -32,6 +33,7 @@ func EncodeFoldersResponse(encoder func(context.Context, http.ResponseWriter) go
 func EncodeImagesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.([]*imageviewer.Image)
+		ctx = context.WithValue(ctx, goahttp.ContentTypeKey, "application/json")
 		enc := encoder(ctx, w)
 		body := NewImagesResponseBody(res)
 		w.WriteHeader(http.StatusOK)

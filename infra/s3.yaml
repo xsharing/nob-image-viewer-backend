@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: s3 buckets for the image service
+
+Parameters:
+  World:
+    Type: String
+    Default: dev
+Resources:
+  S3BucketForImage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'image-${AWS::AccountId}-${World}'
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+  S3BucketForFolderStructure:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'folder-structure-${AWS::AccountId}-${World}'
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+  S3BucketForThumbnail:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'thumbnail-${AWS::AccountId}-${World}'
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+
+Outputs:
+  S3BucketForImage:
+    Value: !Ref S3BucketForImage
+    Export:
+      Name: !Sub ImageBucket-${World}
+  S3BucketForFolderStructure:
+    Value: !Ref S3BucketForFolderStructure
+    Export:
+      Name: !Sub FolderStructureBucket-${World}
+  S3BucketForThumbnail:
+    Value: !Ref S3BucketForThumbnail
+    Export:
+      Name: !Sub ThumbnailBucket-${World}

@@ -35,6 +35,11 @@ provider:
       - ‘image/jpeg’
   httpApi:
     payload: '2.0'
+  environment:
+    STAGE: ${opt:stage, 'dev'}
+    IMAGE_BUCKET: !ImportValue "ImageBucket-${opt:stage, 'dev'}"
+    FOLDER_STRUCTURE_BUCKET: !ImportValue "FolderStructureBucket-${opt:stage, 'dev'}"
+    THUMBNAIL_BUCKET: !ImportValue "ThumbnailBucket-${opt:stage, 'dev'}"
   iamRoleStatements:
     - Effect: "Allow"
       Action:

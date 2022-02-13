@@ -9,4 +9,5 @@ require (
 	github.com/fnproject/fdk-go v0.0.15
 	github.com/tencentyun/scf-go-lib v0.0.0-20211123032342-f972dcd16ff6
 	goa.design/goa/v3 v3.5.4
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )

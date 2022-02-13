@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/sha512"
+	"crypto/sha256"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -20,6 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/btcsuite/btcutil/base58"
 	"golang.org/x/image/draw"
 )
 
@@ -112,5 +113,6 @@ func generateThumbnail(src image.Image) image.Image {
 }
 
 func hash(s string) string {
-	return fmt.Sprintf("%x", sha512.Sum512([]byte(s)))
+	hash := sha256.Sum256([]byte(s))
+	return base58.Encode(hash[:])
 }

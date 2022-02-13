@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"path"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -41,4 +43,18 @@ func handle_file(session client.ConfigProvider, bucket string, key string) {
 
 	size := resp.ContentLength
 	fmt.Printf("retrieved: %s %s %d", bucket, key, size)
+
+	putKeepFile(svc, bucket, key)
+}
+
+func putKeepFile(svc *s3.S3, imageBucket string, imageKey string) {
+	folderStructureBucket := strings.Replace(imageBucket, "image-", "folder-structure-", 1)
+	keepKey := path.Join(path.Dir(imageKey), ".keep")
+
+	params := &s3.PutObjectInput{
+		Bucket: aws.String(folderStructureBucket), // Required
+		Key:    aws.String(keepKey),               // Required,
+	}
+
+	svc.PutObject(params)
 }

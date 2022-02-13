@@ -54,3 +54,10 @@ functions:
       - httpApi:
           path: /images
           method: GET
+  s3_handler:
+    handler: bin/s3_handler
+    events:
+      - s3:
+          bucket: !ImportValue ImageBucket-${opt:stage, 'dev'}
+          event: s3:ObjectCreated:*
+          existing: true

@@ -3,6 +3,7 @@
 build: gomodgen
 	export GO111MODULE=on
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/api api/*.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/s3_handler s3_handler/*.go
 
 clean:
 	rm -rf ./bin ./vendor go.sum

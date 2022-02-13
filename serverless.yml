@@ -35,6 +35,30 @@ provider:
       - ‘image/jpeg’
   httpApi:
     payload: '2.0'
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - "s3:ListAllMyBuckets"
+      Resource: '*'
+    - Effect: "Allow"
+      Action:
+       - "s3:ListBucket"
+       - "s3:GetBucketLocation"
+      Resource:
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}', { BucketArn: !ImportValue "ImageBucket-${opt:stage, 'dev'}" }]}
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}', { BucketArn: !ImportValue "FolderStructureBucket-${opt:stage, 'dev'}" }]}
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}', { BucketArn: !ImportValue "ThumbnailBucket-${opt:stage, 'dev'}" }]}
+    - Effect: "Allow"
+      Action:
+       - "s3:GetObject"
+       - "s3:GetObjectAcl"
+       - "s3:PutObject"
+       - "s3:PutObjectAcl"
+       - "s3:DeleteObject"
+      Resource:
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}/*', { BucketArn: !ImportValue "ImageBucket-${opt:stage, 'dev'}" }]}
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}/*', { BucketArn: !ImportValue "FolderStructureBucket-${opt:stage, 'dev'}" }]}
+        - {Fn::Sub: ['arn:aws:s3:::${BucketArn}/*', { BucketArn: !ImportValue "ThumbnailBucket-${opt:stage, 'dev'}" }]}
 
 plugins:
   - serverless-offline

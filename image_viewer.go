@@ -1,16 +1,21 @@
 package imageviewerapi
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"log"
 	"os"
 	"path"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/btcsuite/btcutil/base58"
 	imageviewer "github.com/image-viewer/nob-image-viewer-backend/gen/image_viewer"
 )
 
@@ -84,8 +89,70 @@ func Const2Ptr(str string) *string {
 // Images implements images.
 func (s *imageViewersrvc) Images(ctx context.Context, p *imageviewer.ImagesPayload) (res []*imageviewer.Image, err error) {
 	s.logger.Print("imageViewer.images")
-	return []*imageviewer.Image{
-		{Name: Const2Ptr("a"), ThumbnailURL: Const2Ptr("https://dummyimage.com/200x200/000/00f"), OriginalURL: Const2Ptr("https://dummyimage.com/1280x1280/000/00f")},
-		{Name: Const2Ptr("b"), ThumbnailURL: Const2Ptr("https://dummyimage.com/200x200/000/00f"), OriginalURL: Const2Ptr("https://dummyimage.com/1280x1280/000/00f")},
-	}, nil
+
+	session := session.Must(session.NewSession())
+	svc := s3.New(session)
+
+	pageNum := 0
+
+	hashPrefix := fmt.Sprintf("%s/", hash(*p.Folder))
+
+	params := &s3.ListObjectsV2Input{
+		Bucket: aws.String(os.Getenv("THUMBNAIL_BUCKET")),
+		Prefix: aws.String(path.Join(hashPrefix, *p.Folder)),
+	}
+
+	err = svc.ListObjectsV2Pages(
+		params,
+		func(page *s3.ListObjectsV2Output, lastPage bool) bool {
+			pageNum++
+			fmt.Println(page)
+
+			for _, obj := range page.Contents {
+				thumbailRequest, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+					Bucket: aws.String(os.Getenv("THUMBNAIL_BUCKET")),
+					Key:    obj.Key,
+				})
+				thumbnailPresigned, _ := thumbailRequest.Presign(1 * time.Hour)
+				originalRequest, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+					Bucket: aws.String(os.Getenv("IMAGE_BUCKET")),
+					Key:    aws.String(strings.TrimPrefix(aws.StringValue(obj.Key), hashPrefix)),
+				})
+				originalPresigned, _ := originalRequest.Presign(1 * time.Hour)
+
+				holder := &imageviewer.Image{
+					Name:         aws.String(path.Base(*obj.Key)),
+					ThumbnailURL: aws.String(thumbnailPresigned),
+					OriginalURL:  aws.String(originalPresigned),
+				}
+
+				res = append(res, holder)
+			}
+
+			return lastPage
+		},
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return res, err
+}
+
+func hash(s string) string {
+	fmt.Printf("hash:%s\n", s)
+	var buffer bytes.Buffer
+	if !strings.HasPrefix(s, "/") {
+		buffer.WriteString("/")
+	}
+
+	buffer.WriteString(s)
+
+	if !strings.HasSuffix(s, "/") {
+		buffer.WriteString("/")
+	}
+
+	hash := sha256.Sum256([]byte(buffer.String()))
+	return base58.Encode(hash[:])
 }

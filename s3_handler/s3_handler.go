@@ -11,6 +11,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"math"
+	"net/url"
 	"path"
 	"strings"
 
@@ -39,6 +40,10 @@ func main() {
 }
 
 func handle_file(session client.ConfigProvider, bucket string, key string) {
+	// fmt.Printf("handle_file(before unescape): %s %s\n", bucket, key)
+	key, err := url.QueryUnescape(key)
+	fmt.Printf("handle_file: %s %s\n", bucket, key)
+
 	svc := s3.New(session)
 	params := &s3.GetObjectInput{
 		Bucket: aws.String(bucket), // Required
@@ -48,12 +53,12 @@ func handle_file(session client.ConfigProvider, bucket string, key string) {
 	defer resp.Body.Close()
 
 	if err != nil {
-		fmt.Printf("error: %s %s %s\n", bucket, key, err.Error())
+		fmt.Printf("get object error: %s\n", err.Error())
 		panic(err)
 	}
 
 	size := resp.ContentLength
-	fmt.Printf("retrieved: %s %s %d\n", bucket, key, size)
+	fmt.Printf("retrieved: %d\n", size)
 
 	putKeepFile(svc, bucket, key)
 
@@ -113,6 +118,18 @@ func generateThumbnail(src image.Image) image.Image {
 }
 
 func hash(s string) string {
-	hash := sha256.Sum256([]byte(s))
+	fmt.Printf("hash:%s\n", s)
+	var buffer bytes.Buffer
+	if !strings.HasPrefix(s, "/") {
+		buffer.WriteString("/")
+	}
+
+	buffer.WriteString(s)
+
+	if !strings.HasSuffix(s, "/") {
+		buffer.WriteString("/")
+	}
+
+	hash := sha256.Sum256([]byte(buffer.String()))
 	return base58.Encode(hash[:])
 }
